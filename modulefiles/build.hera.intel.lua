@@ -5,7 +5,7 @@ Load environment to compile UFS_UTILS on Hera using Intel
 hpss_ver=os.getenv("hpss_ver") or ""
 load(pathJoin("hpss", hpss_ver))
 
-prepend_path("MODULEPATH", "/scratch1/NCEPDEV/nems/role.epic/spack-stack/spack-stack-1.6.0/envs/unified-env/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/scratch1/NCEPDEV/nems/role.epic/spack-stack/spack-stack-1.6.0/envs/unified-env-rocky8/install/modulefiles/Core")
 
 stack_intel_ver=os.getenv("stack_intel_ver") or "2021.5.0"
 load(pathJoin("stack-intel", stack_intel_ver))
@@ -16,6 +16,9 @@ load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
 cmake_ver=os.getenv("cmake_ver") or "3.23.1"
 load(pathJoin("cmake", cmake_ver))
 
+python_ver=os.getenv("python_ver") or "3.10.13"
+load(pathJoin("python", python_ver))
+ 
 bacio_ver=os.getenv("bacio_ver") or "2.4.1"
 load(pathJoin("bacio", bacio_ver))
 
