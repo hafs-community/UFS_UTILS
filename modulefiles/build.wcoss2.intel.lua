@@ -27,10 +27,10 @@ libpng_ver=os.getenv("libpng_ver") or "1.6.37"
 load(pathJoin("libpng", libpng_ver))
 
 hdf5_ver=os.getenv("hdf5_ver") or "1.14.0"
-load(pathJoin("hdf5-B", hdf5_ver))
+load(pathJoin("hdf5-A", hdf5_ver))
 
 netcdf_ver=os.getenv("netcdf_ver") or "4.9.2"
-load(pathJoin("netcdf-B", netcdf_ver))
+load(pathJoin("netcdf-A", netcdf_ver))
 
 bacio_ver=os.getenv("bacio_ver") or "2.4.1"
 load(pathJoin("bacio", bacio_ver))
