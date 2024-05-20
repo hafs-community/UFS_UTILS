@@ -222,6 +222,8 @@ Land-sea mask and land fraction are created from a global 30-arc second Universi
       * Kim, Y-J and A. Arakawa, 1995: Improvement of orographic gravity wave parameterization using a mesoscale gravity wave model.  J. Atmos. Sci. 52, pp 1875-1902.
       * Lott, F. and M. J. Miller: 1977: A new sub-grid scale orographic drag parameterization: Its formulation and testing, QJRMS, 123, pp 101-127.
 
+**Caution:** At model grid resolutions of 1 km, the 30-arc-second input data will not be sufficient to properly resolve the land-sea mask, land fraction and orography fields. At model grid resolutions finer than 3 km, the remaining fields (used by the GWD) will not be well resolved. In that case, users should consider not running with GWD.
+
 Code structure
 --------------
 
@@ -373,8 +375,13 @@ Program inputs and outputs
 
       * grid file - the "grid" file from the make_hgrid or regional_esg programs  - CRES_grid.tile#.nc - (NetCDF)
       * orography file - the orography file including the 'inland' flag record from the inland program - oro.CRES.tile#.nc (NetCDF)
-      * lake status code file - GlobalLakeStatus.dat (located in `./fix/fix_orog <https://noaa-ufs-srw-pds.s3.amazonaws.com/index.html#fix/fix_orog/>`_). See GlobalLakeStatus.txt for the defintion of each code.
-      * lake depth file - GlobalLakeDepth.dat (located in `./fix/fix_orog <https://noaa-ufs-srw-pds.s3.amazonaws.com/index.html#fix/fix_orog/>`_). See GlobalLakeDepth.txt for a description of this file.
+      * lake status code file - One of the following files. (located in `./fix/fix_orog <https://noaa-ufs-srw-pds.s3.amazonaws.com/index.html#fix/fix_orog/>`_). See GlobalLakeStatus.txt for a description of the file format.
+          * GlobalLakeStatus_MOSISp.dat
+          * GlobalLakeStatus_GLDBv3release.dat
+          * GlobalLakeStatus_VIIRS.dat
+      * lake depth file - One of the following files. (located in `./fix/fix_orog <https://noaa-ufs-srw-pds.s3.amazonaws.com/index.html#fix/fix_orog/>`_). See GlobalLakeDepth.txt for a description of this file.
+          * GlobalLakeDepth_GLDBv3release.dat
+          * GlobalLakeDepth_GLOBathy.dat
 
 **Output data:**
 
@@ -526,7 +533,7 @@ The surface climatological data is located here `./fix/fix_sfc_climo <https://no
 
       * Global 1-degree fractional coverage strong/weak zenith angle albedo - facsf.1.0.nc
       * Global 0.05-degree maximum snow albedo - maximum_snow_albedo.0.05.nc
-      * Global 2.6 x 1.5-degree soil substrate temperature - substrate_temperature.2.6x1.5.nc
+      * Global 0.5-degree soil substrate temperature - substrate_temperature.gfs.0.5.nc
       * Global 0.05-degree four component monthly snow-free albedo - snowfree_albedo.4comp.0.05.nc
       * Global 1.0-degree categorical slope type - slope_type.1.0.nc
       * Global 0.05-degree CLM soil color (Lawrence and Chase, 2007 JGR) - soil_color.clm.0.05.nc
@@ -537,19 +544,14 @@ The surface climatological data is located here `./fix/fix_sfc_climo <https://no
              * N Hemis 30 sec - soil_type.statsgo.nh.30s.nc
              * Global 30 sec - soil_type.statsgo.30s.nc
       * Categorical BNU soil type
-             * Global 30-second - soil_type.bnu.30s.nc
+             * Global 30-second - soil_type.bnu.v3.30s.nc
       * Categorical IGBP vegetation type
              * MODIS-based global 0.05-degree - vegetation_type.modis.igbp.0.05.nc
              * MODIS-based global 0.03-degree - vegetation_type.modis.igbp.0.03.nc
              * MODIS-based CONUS 30 sec - vegetation_type.modis.igbp.conus.30s.nc
              * MODIS-based N Hemis 30 sec - vegetation_type.modis.igbp.nh.30s.nc
              * MODIS-based global 30 sec - vegetation_type.modis.igbp.30s.nc
-             * NESDIS VIIRS-based global 0.10-degree - vegetation_type.viirs.igbp.0.1.nc
-             * NESDIS VIIRS-based global 0.05-degree - vegetation_type.viirs.igbp.0.05.nc
-             * NESDIS VIIRS-based global 0.03-degree - vegetation_type.viirs.igbp.0.03.nc
-             * NESDIS VIIRS-based CONUS 30-second - vegetation_type.viirs.igbp.conus.30s.nc
-             * NESDIS VIIRS-based N HEMIS 30-second - vegetation_type.viirs.igbp.nh.30s.nc
-             * NESDIS VIIRS-based global 30-second - vegetation_type.viirs.igbp.30s.nc
+             * NESDIS VIIRS-based global 30-second - vegetation_type.viirs.v3.igbp.30s.nc
       * Global 0.144-degree monthly vegetation greenness in percent - vegetation_greenness.0.144.nc
 
 The files that define the model grid. All NetCDF.
