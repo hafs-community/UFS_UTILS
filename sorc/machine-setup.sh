@@ -76,7 +76,7 @@ elif [[ -d /lustre && -d /ncrc ]] ; then
       unset __ms_source_etc_profile
     fi
     target=gaea
-elif [[ "$(hostname)" =~ "Orion" ]]; then
+elif [[ "$(hostname)" =~ "Orion" || "$(hostname)" =~ "orion" ]]; then
     target="orion"
     module purge
 elif [[ "$(hostname)" =~ "hercules" || "$(hostname)" =~ "Hercules" ]]; then
