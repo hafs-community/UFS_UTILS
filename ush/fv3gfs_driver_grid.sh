@@ -197,7 +197,7 @@ if [ $gtype = uniform ] || [ $gtype = stretch ] || [ $gtype = nest ];  then
     echo "............ Execute fv3gfs_make_orog.sh for tile $tile .................."
     echo
     set -x
-    $script_dir/fv3gfs_make_orog.sh $res $tile $grid_dir $orog_dir $script_dir $topo
+    $script_dir/fv3gfs_make_orog.sh $res $tile $grid_dir $orog_dir $topo
     err=$?
     if [ $err != 0 ]; then
       exit $err
@@ -399,7 +399,7 @@ elif [ $gtype = regional_gfdl ] || [ $gtype = regional_esg ]; then
   echo "............ Execute fv3gfs_make_orog.sh for tile $tile .................."
   echo
   set -x
-  $script_dir/fv3gfs_make_orog.sh $res $tile $grid_dir $orog_dir $script_dir $topo
+  $script_dir/fv3gfs_make_orog.sh $res $tile $grid_dir $orog_dir $topo
   err=$?
   if [ $err != 0 ]; then
     exit $err
@@ -636,7 +636,7 @@ The following parameters were used
         soil_type=$soil_type_src
 	lake_data_srce=$lake_data_srce
         target_lon=$target_lon          # Center longitude of grid
-        target_lat=target_lat           # Center latitude of grid
+        target_lat=$target_lat          # Center latitude of grid
         idim=$idim                      # Dimension of grid in 'i' direction
         jdim=$jdim                      # Dimension of grid in 'j' direction
         delx=$delx                      # Grid spacing (in degrees) in the 'i' direction

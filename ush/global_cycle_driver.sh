@@ -15,13 +15,12 @@ export CDUMP=${CDUMP:-gfs}                   # gfs or gdas
 export COMPONENT=${COMPONENT:-atmos}
 
 pwd=$(pwd)
-export NWPROD=${NWPROD:-$pwd}
-export DMPDIR=${DMPDIR:-$NWPROD}
-export HOMEgfs=${HOMEgfs:-$NWPROD/gfs.v15.0.0}
-export FIX_DIR=${FIX_DIR:-$HOMEgfs/fix}   
-export FIXam=${FIXam:-$FIX_DIR/am}   
-export OROFIX=${OROFIX:-$FIX_DIR/orog/${CASE}}
-export FIX_SFC=${FIX_SFC:-$OROFIX/sfc}
+export DMPDIR=${DMPDIR:-$pwd}
+export PACKAGEROOT=${PACKAGEROOT:-/lfs/h1/ops/prod/packages}
+export gfs_ver=${gfs_ver:-v15.0.0}
+export HOMEgfs=${HOMEgfs:-${PACKAGEROOT}/gfs.${gfs_ver}}
+export FIXgfs=${FIXgfs:-$HOMEgfs/fix}   
+export FIXorog=${FIXorog:-$FIXgfs/orog}
 
 ntiles=${ntiles:-6}
 DONST=${DONST:-"NO"}
@@ -54,8 +53,9 @@ fi
 
 export DO_SFCCYLE=${DO_SFCCYCLE:-".true."}
 export DO_LNDINC=${DO_LNDINC:-".false."}
-export LND_SOI_FILE=${LND_SOI_FILE:-"NULL"}
-export DO_SNO_INC=${DO_SNO_INC:-".false."}
+export DO_SOI_INC_GSI=${DO_SOI_INC_GSI:-".false."}
+export DO_SNO_INC_JEDI=${DO_SNO_INC_JEDI:-".false."}
+export DO_SOI_INC_JEDI=${DO_SOI_INC_JEDI:-".false."}
 export FRAC_GRID=${FRAC_GRID:-".false."}
 
 CRES=$(echo $CASE | cut -c 2-)
@@ -88,15 +88,23 @@ for n in $(seq 1 $ntiles); do
   chmod 644  $COMOUT/$PDY.${cyc}0000.sfcanl_data.tile${n}.nc
   ln -fs $COMOUT/$PDY.${cyc}0000.sfcanl_data.tile${n}.nc  $DATA/fnbgso.00$n
 
-  ln -fs $OROFIX/C${CRES}_grid.tile${n}.nc       $DATA/fngrid.00$n
+  ln -fs $FIXorog/${CASE}/C${CRES}_grid.tile${n}.nc       $DATA/fngrid.00$n
   if (( OCNRES > 9999 ));then
-    ln -fs $OROFIX/C${CRES}_oro_data.tile${n}.nc   $DATA/fnorog.00$n
+    ln -fs $FIXorog/${CASE}/C${CRES}_oro_data.tile${n}.nc   $DATA/fnorog.00$n
   else
-    ln -fs $OROFIX/C${CRES}.mx${OCNRES}_oro_data.tile${n}.nc   $DATA/fnorog.00$n
+    ln -fs $FIXorog/${CASE}/C${CRES}.mx${OCNRES}_oro_data.tile${n}.nc   $DATA/fnorog.00$n
   fi
 
-  if [[ "$DO_SNO_INC" == ".true." ]] ; then  
-        ln -fs $COMIN/$PDY.${cyc}0000.xainc.tile${n}.nc      $DATA/xainc.00$n
+  if [[ "$DO_SNO_INC_JEDI" == ".true." ]] ; then  
+        ln -fs $COMIN/$PDY.${cyc}0000.xainc.tile${n}.nc      $DATA/snow_xainc.00$n
+  fi
+
+  if [[ "$DO_SOI_INC_JEDI" == ".true." ]] ; then
+        ln -fs $COMIN/soil_sfcincr_jedi.00$n $DATA/soil_xainc.00$n
+  fi
+
+  if [[ "$DO_SOI_INC_GSI" == ".true." ]] ; then
+        ln -fs $COMIN/sfcincr_gsi.00$n $DATA/sfcincr_gsi.00$n
   fi
 done
 

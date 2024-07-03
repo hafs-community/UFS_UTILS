@@ -25,10 +25,14 @@ target_include_directories(orog_lib INTERFACE ${mod_dir})
 target_link_libraries(
   orog_lib
   PUBLIC
+  bacio::bacio_4
   w3emc::w3emc_d
   ip::ip_d
-  sp::sp_d
   NetCDF::NetCDF_Fortran)
+
+if(sp_FOUND)
+  target_link_libraries(orog_lib PUBLIC sp::sp_d)
+endif()
 
 if(OpenMP_Fortran_FOUND)
   target_link_libraries(orog_lib PUBLIC OpenMP::OpenMP_Fortran)
