@@ -27,10 +27,10 @@ libpng_ver=os.getenv("libpng_ver") or "1.6.37"
 load(pathJoin("libpng", libpng_ver))
 
 hdf5_ver=os.getenv("hdf5_ver") or "1.14.0"
-load(pathJoin("hdf5-A", hdf5_ver))
+load(pathJoin("hdf5-C", hdf5_ver))
 
 netcdf_ver=os.getenv("netcdf_ver") or "4.9.2"
-load(pathJoin("netcdf-A", netcdf_ver))
+load(pathJoin("netcdf-C", netcdf_ver))
 
 bacio_ver=os.getenv("bacio_ver") or "2.4.1"
 load(pathJoin("bacio", bacio_ver))
@@ -69,7 +69,7 @@ load(pathJoin("gsl", gsl_ver))
 nco_ver=os.getenv("nco_ver") or "4.7.9"
 load(pathJoin("nco", nco_ver))
 
-esmf_ver=os.getenv("esmf_ver") or "8.5.0"
-load(pathJoin("esmf-B", esmf_ver))
+esmf_ver=os.getenv("esmf_ver") or "8.6.0"
+load(pathJoin("esmf-C", esmf_ver))
 
 whatis("Description: UFS_UTILS build environment")
