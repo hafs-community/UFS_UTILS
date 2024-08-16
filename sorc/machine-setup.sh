@@ -76,7 +76,12 @@ elif [[ -d /lustre && -d /ncrc ]] ; then
       unset __ms_source_etc_profile
     fi
     target=gaea
-elif [[ "$(hostname)" =~ "Orion" || "$(hostname)" =~ "orion" ]]; then
+elif [[ "$(hostname)" == "gaea6"* && -d /gpfs/f6 ]] ; then
+    target=gaeaC6
+    source /opt/cray/pe/lmod/8.7.31/init/$__ms_shell
+    target=gaeaC6
+    module purge
+elif [[ "$(hostname)" =~ "orion" || "$(hostname)" =~ "Orion" ]]; then
     target="orion"
     module purge
 elif [[ "$(hostname)" =~ "hercules" || "$(hostname)" =~ "Hercules" ]]; then
