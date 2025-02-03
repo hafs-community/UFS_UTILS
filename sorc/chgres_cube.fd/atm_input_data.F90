@@ -2019,6 +2019,7 @@ implicit none
  real(esmf_kind_r8), pointer           :: presptr(:,:,:), psptr(:,:),tptr(:,:,:), &
                                           qptr(:,:,:), wptr(:,:,:),  &
                                           uptr(:,:,:), vptr(:,:,:)
+ real(esmf_kind_r8), allocatable       :: tmp1d(:)
  real(esmf_kind_r4)                    :: value
  real(esmf_kind_r8), parameter         :: p0 = 100000.0
  real(esmf_kind_r8), allocatable       :: dummy3d_col_in(:),dummy3d_col_out(:)
@@ -2816,7 +2817,10 @@ if (.not. isnative) then
 
    if (localpet == 0) then
      print*,'psfc is ',clb(1),clb(2),psptr(clb(1),clb(2))
-     print*,'pres is ',cub(1),cub(2),presptr(cub(1),cub(2),:) 
+     allocate(tmp1d(clb(3):cub(3)))
+     tmp1d = presptr(cub(1),cub(2),:)
+     print*,'pres is ',cub(1),cub(2),tmp1d
+     deallocate(tmp1d) 
    
      print*,'pres check 1',localpet,maxval(presptr(clb(1):cub(1),clb(2):cub(2),1)), &
           minval(presptr(clb(1):cub(1),clb(2):cub(2),1))

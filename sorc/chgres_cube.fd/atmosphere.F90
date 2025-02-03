@@ -964,6 +964,7 @@
  real(esmf_kind_r8), pointer     :: psptr(:,:)  ! adjusted surface p.
  real(esmf_kind_r8)              :: ak, bk
  real(esmf_kind_r8), allocatable :: pi(:,:,:)
+ real(esmf_kind_r8), allocatable :: tmp1d(:)
                 
  print*,"COMPUTE 3-D PRESSURE FROM ADJUSTED SURFACE PRESSURE."
 
@@ -1036,9 +1037,15 @@
 
  deallocate(pi)
 
- if (localpet == 0) then
-    print*,'new pres ',pptr(clb(1),clb(2),:)
-    print*,'delp     ',delp_ptr(clb(1),clb(2),:)
+ if (localpet == 0) then 
+    allocate(tmp1d(clb(3):cub(3)))
+    tmp1d = pptr(clb(1),clb(2),:)
+!    print*,'new pres ',pptr(clb(1),clb(2),:)
+    print*,'new pres ',tmp1d
+    tmp1d = delp_ptr(clb(1),clb(2),:)
+!    print*,'delp     ',delp_ptr(clb(1),clb(2),:)
+    print*,'delp     ',tmp1d
+    deallocate(tmp1d)
  endif
 
  end subroutine newpr1 
@@ -1085,6 +1092,7 @@
  real(esmf_kind_r8)              :: atvd, fp1, gamma, pu
  real(esmf_kind_r8)              :: tvu, pd, tvd
  real(esmf_kind_r8)              :: at, aq, ap, az
+ real(esmf_kind_r8), allocatable :: tmp1d(:)
 
  ftv(at,aq)=at*(1+fv*aq)
  fgam(apu,atvu,apd,atvd)=-gor*log(atvd/atvu)/log(apd/apu)
@@ -1104,7 +1112,11 @@
     call error_handler("IN FieldGet", rc)
 
  if(localpet==0) then
-   print*,'old pres ',pptr(clb(1),clb(2),:)
+   allocate(tmp1d(clb(3):cub(3)))
+   tmp1d = pptr(clb(1),clb(2),:)
+!   print*,'old pres ',pptr(clb(1),clb(2),:)
+   print*,'old pres ',tmp1d
+   deallocate(tmp1d)
  endif
 
  print*,"- CALL FieldGet FOR TEMPERATURE"

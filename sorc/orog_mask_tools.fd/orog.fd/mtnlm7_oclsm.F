@@ -1644,8 +1644,8 @@ C  (*j*)  for hard wired zero offset (lambda s =0) for terr05
               call ABORT()
             endif
 
-            if(inside_a_polygon(LONI*D2R,LATI*D2R,4,
-     &          LONO*D2R,LATO*D2R))then
+            if(inside_a_polygon(LONI,LATI,4,
+     &          LONO,LATO,D2R))then
 
                XLAND = XLAND + FLOAT(ZSLM(ii,jj))
                XWATR = XWATR + FLOAT(1-ZSLM(ii,jj))
@@ -1809,8 +1809,8 @@ C  (*j*)  for hard wired zero offset (lambda s =0) for terr05
             XW1_ALL = XW1_ALL + HEIGHT_ALL
             XW2_ALL = XW2_ALL + HEIGHT_ALL ** 2
 
-            if(inside_a_polygon(LONI*D2R,LATI*D2R,4,
-     &          LONO*D2R,LATO*D2R))then
+            if(inside_a_polygon(LONI,LATI,4,
+     &          LONO,LATO,D2R))then
 
                XLAND = XLAND + FLOAT(ZSLM(ii,jj))
                XWATR = XWATR + FLOAT(1-ZSLM(ii,jj))
@@ -2296,8 +2296,8 @@ C
               i1 = ilist(i2)         
               LONI = i1*DELXN
               LATI = -90 + j1*DELXN
-              INSIDE : if(inside_a_polygon(LONI*D2R,LATI*D2R,4,
-     &           LONO*D2R,LATO*D2R))then
+              INSIDE : if(inside_a_polygon(LONI,LATI,4,
+     &           LONO,LATO,D2R))then
 
 C===  set the rest of the indexs for ave: 2pt staggered derivitive
 C
@@ -2959,8 +2959,8 @@ C     IN A GRID BOX
             i1 = ilist(ii1)
             LONI = i1*DELXN
             LATI = -90 + j1*DELXN
-            if(inside_a_polygon(LONI*D2R,LATI*D2R,4,
-     &          LONO*D2R,LATO*D2R))then
+            if(inside_a_polygon(LONI,LATI,4,
+     &          LONO,LATO,D2R))then
 
               HEIGHT = FLOAT(ZAVG(I1,J1))
               IF(HEIGHT.LT.-990.) HEIGHT = 0.0
@@ -3538,8 +3538,8 @@ C     IN A GRID BOX
             i1 = ilist(ii1)
             LONI = i1*DELXN
             LATI = -90 + j1*DELXN
-            if(inside_a_polygon(LONI*D2R,LATI*D2R,4,
-     &          LONO*D2R,LATO*D2R))then
+            if(inside_a_polygon(LONI,LATI,4,
+     &          LONO,LATO,D2R))then
 
               HEIGHT = FLOAT(ZAVG(I1,J1))
               IF(HEIGHT.LT.-990.) HEIGHT = 0.0
@@ -4109,7 +4109,8 @@ C
 !! @return inside_a_polygon When true, point is within
 !! the polygon.
 !! @author GFDL programmer
-      FUNCTION inside_a_polygon(lon1, lat1, npts, lon2, lat2)
+      FUNCTION inside_a_polygon(lon1_in, lat1_in, npts, 
+     &                          lon2_in, lat2_in, cfac)
         implicit none
         real, parameter :: EPSLN10 = 1.e-10
         real, parameter :: EPSLN8 = 1.e-8
@@ -4117,15 +4118,25 @@ C
         real, parameter :: RANGE_CHECK_CRITERIA=0.05
         real :: anglesum, angle, spherical_angle
         integer i, ip1
-        real lon1, lat1
-        integer npts
-        real lon2(npts), lat2(npts)
+        real, intent(in) :: lon1_in, lat1_in, cfac
+        integer, intent(in) :: npts
+        real, intent(in) :: lon2_in(npts), lat2_in(npts)
+        real :: lon1, lat1
+        real :: lon2(npts), lat2(npts)
         real x2(npts), y2(npts), z2(npts)
         real lon1_1d(1), lat1_1d(1)
         real x1(1), y1(1), z1(1)
         real pnt0(3),pnt1(3),pnt2(3)
         logical inside_a_polygon
         real max_x2,min_x2,max_y2,min_y2,max_z2,min_z2
+! 
+!  convert Degree to Radian if needed
+        lon1 = lon1_in * cfac
+        lat1 = lat1_in * cfac
+        do i = 1, npts
+           lon2(i) = lon2_in(i) * cfac
+           lat2(i) = lat2_in(i) * cfac
+        enddo
         !first convert to cartesian grid */
         call latlon2xyz(npts,lon2, lat2, x2, y2, z2);
         lon1_1d(1) = lon1

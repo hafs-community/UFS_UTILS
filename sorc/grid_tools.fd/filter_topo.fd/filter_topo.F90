@@ -47,6 +47,7 @@ program filter_topo
   real, allocatable :: dxc(:,:,:), dyc(:,:,:)
   real, allocatable :: area(:,:,:)
   real, allocatable :: sin_sg(:,:,:,:)
+  real, allocatable :: tmp_oro(:,:,:)
 
   integer           :: is,ie,js,je,isd,ied,jsd,jed
   integer,parameter :: ng = 3
@@ -79,7 +80,10 @@ program filter_topo
                      stretch_fac, nested, area, dxa, dya, dx, dy, dxc, dyc, sin_sg, oro, regional )
 
   !--- write out the data
-  call write_topo_file(is,ie,js,je,ntiles,oro(is:ie,js:je,:),regional )
+  allocate(tmp_oro(is:ie,js:je,ntiles))
+  tmp_oro=oro(is:ie,js:je,:)
+  call write_topo_file(is,ie,js,je,ntiles,tmp_oro,regional )
+  deallocate(tmp_oro)
 
   print*
   print*,'- NORMAL TERMINATION.'
@@ -1063,8 +1067,10 @@ contains
        if(dimsiz .NE. ny) call handle_err(-1, "mismatch of lat dimension size between "// &
             trim(grid_file)//' and '//trim(tile_file) )
 
-       status = nf_get_var_double(ncid, id_var, oro(is:ie,js:je,nt))
+       status = nf_get_var_double(ncid, id_var, tmp)
        call handle_err(status, 'get the value of '//trim(topo_field)//' from file '//trim(tile_file) )
+
+       oro(is:ie,js:je,nt) =tmp
 
        status=nf_inq_varid(ncid, mask_field, id_var)
        call handle_err(status, 'inquire varid of '//trim(mask_field)//' from file '//trim(tile_file) )
