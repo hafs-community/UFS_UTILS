@@ -38,6 +38,14 @@ elif [[ -d /scratch1 ]] ; then
     fi
     target=hera
     module purge
+elif [[ -d //tds_scratch2/SYSADMIN/pilot-users ]]; then
+    # We are on NOAA Ursa
+    if ( ! eval module help > /dev/null 2>&1 ) ; then
+        echo load the module command 1>&2
+        source $MODULESHOME/init/$__ms_shell
+    fi
+    target=ursa
+    module purge
 elif [[ -d /lustre && -d /ncrc ]] ; then
     # We are on GAEA.
     if ( ! eval module help > /dev/null 2>&1 ) ; then
