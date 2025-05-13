@@ -15,7 +15,9 @@
 module atm_input_data
  use esmf
  use netcdf
+#ifdef CHGRES_ALL
  use nemsio_module
+#endif
 
  use program_setup, only          : data_dir_input_grid, &
                                     atm_files_input_grid, &
@@ -108,6 +110,7 @@ implicit none
 ! Read the gaussian history files in nemsio format.
 !-------------------------------------------------------------------------------
 
+#ifdef CHGRES_ALL
  elseif (trim(input_type) == "gaussian_nemsio") then  ! fv3gfs gaussian nemsio
 
    call read_input_atm_gaussian_nemsio_file(localpet)
@@ -128,6 +131,7 @@ implicit none
  
    call read_input_atm_gfs_sigio_file(localpet)
 
+#endif
 !-------------------------------------------------------------------------------
 ! Read fv3gfs data in grib2 format.
 !-------------------------------------------------------------------------------
@@ -253,6 +257,7 @@ implicit none
  
  end subroutine init_atm_esmf_fields
 
+#ifdef CHGRES_ALL
 !> Read input atmospheric data from spectral gfs (old sigio format).
 !! 
 !! @note Format used prior to July 19, 2017.
@@ -491,6 +496,9 @@ implicit none
  endif
 
  end subroutine read_input_atm_gfs_sigio_file
+#endif
+
+#ifdef CHGRES_ALL
 
 !> Read input atmospheric data from spectral gfs (global gaussian in
 !! nemsio format. Starting July 19, 2017).
@@ -745,6 +753,9 @@ implicit none
  deallocate(pi)
 
  end subroutine read_input_atm_gfs_gaussian_nemsio_file
+#endif
+
+#ifdef CHGRES_ALL
 
 !> Read input grid atmospheric fv3 gaussian nemsio files.
 !!
@@ -1024,6 +1035,7 @@ implicit none
  call ESMF_FieldDestroy(dpres_input_grid, rc=rc)
 
  end subroutine read_input_atm_gaussian_nemsio_file
+#endif
 
 !> Read input grid fv3 atmospheric data 'warm' restart files.
 !!
@@ -1978,7 +1990,7 @@ implicit none
 
  integer, intent(in)                   :: localpet
  
- integer, parameter                    :: ntrac_max=14
+ integer, parameter                    :: ntrac_max=15
  integer, parameter                    :: max_levs=1000
 
  character(len=300)                    :: the_file
@@ -2015,7 +2027,8 @@ implicit none
  real(esmf_kind_r8), allocatable       :: rlevs(:)
  real(esmf_kind_r4), allocatable       :: dummy2d(:,:)
  real(esmf_kind_r8), allocatable       :: dummy3d(:,:,:), dummy2d_8(:,:),&
-                                          u_tmp_3d(:,:,:), v_tmp_3d(:,:,:)
+                                          u_tmp_3d(:,:,:), v_tmp_3d(:,:,:),&
+                                          dummy3d_pres(:,:,:)
  real(esmf_kind_r8), pointer           :: presptr(:,:,:), psptr(:,:),tptr(:,:,:), &
                                           qptr(:,:,:), wptr(:,:,:),  &
                                           uptr(:,:,:), vptr(:,:,:)
@@ -2031,18 +2044,19 @@ implicit none
  
  tracers(:) = "NULL"
  
- trac_names_oct10 = (/1,  1,  14,  1,  1,  1,  1, 6,  6,   1,  6,  13,  13, 2 /)
- trac_names_oct11 = (/0, 22, 192, 23, 24, 25, 32, 1, 29, 100, 28, 193, 192, 2 /)
+ trac_names_oct10 = (/1,  1,  14,  1,  1,  1,  1, 6,  6,   1,  6,  13,  13, 2, 20 /)
+ trac_names_oct11 = (/0, 22, 192, 23, 24, 25, 32, 1, 29, 100, 28, 193, 192, 2,  0 /)
+
 
  trac_names_vmap = (/"sphum   ", "liq_wat ", "o3mr    ", "ice_wat ", &
                      "rainwat ", "snowwat ", "graupel ", "cld_amt ", "ice_nc  ", &
                      "rain_nc ", "water_nc", "liq_aero", "ice_aero", &
-                     "sgs_tke "/)
+                     "sgs_tke ", "massden "/)
 
  tracers_default = (/"sphum   ", "liq_wat ", "o3mr    ", "ice_wat ", &
                      "rainwat ", "snowwat ", "graupel ", "cld_amt ", "ice_nc  ", &
                      "rain_nc ", "water_nc", "liq_aero", "ice_aero", &
-                     "sgs_tke "/)
+                     "sgs_tke ", "smoke   "/)
 
  the_file = trim(data_dir_input_grid) // "/" // trim(grib2_file_input_grid)
 
@@ -2394,11 +2408,19 @@ implicit none
    allocate(dummy2d(i_input,j_input))
    allocate(dummy2d_8(i_input,j_input))
    allocate(dummy3d(i_input,j_input,lev_input))
+   if (trim(external_model) .eq. 'RAP' .or. &  ! for smoke conversion
+       trim(external_model) .eq. 'HRRR' ) then
+      allocate(dummy3d_pres(i_input,j_input,lev_input))
+    endif
    allocate(dum2d_1(i_input,j_input))
  else
    allocate(dummy2d(0,0))
    allocate(dummy2d_8(0,0))
    allocate(dummy3d(0,0,0))
+   if (trim(external_model) .eq. 'RAP' .or. &  ! for smoke conversion
+       trim(external_model) .eq. 'HRRR' ) then
+      allocate(dummy3d_pres(0,0,0))
+   endif
    allocate(dum2d_1(0,0))
  endif
 
@@ -2458,12 +2480,61 @@ implicit none
    call get_var_cond(vname,this_miss_var_method=method, this_miss_var_value=value, &
                        this_field_var_name=tmpstr,loc=varnum)
 
-   if (n==1 .and. .not. hasspfh) then 
+   if (n==1 .and. .not. hasspfh .or. &
+     ( (trim(external_model) .eq. 'RAP' .or. &  ! for smoke conversion
+       trim(external_model) .eq. 'HRRR' ) .and. &
+       tracers_input_vmap(n) == trac_names_vmap(15) )) then 
      print*,"- CALL FieldGather TEMPERATURE." 
      call ESMF_FieldGather(temp_input_grid,dummy3d,rootPet=0, tile=1, rc=rc)
      if(ESMF_logFoundError(rcToCheck=rc,msg=ESMF_LOGERR_PASSTHRU,line=__LINE__,file=__FILE__)) &
      call error_handler("IN FieldGet", rc) 
    endif
+
+   if ( (trim(external_model) .eq. 'RAP' .or. &  ! for smoke conversion
+       trim(external_model) .eq. 'HRRR' ) .and. &
+       tracers_input_vmap(n) == trac_names_vmap(15)) then
+
+    if (localpet == 0) then
+
+    print*,"- READ PRESSURE FOR SMOKE CONVERSION."
+
+    jdisc   = 0     ! search for discipline - meteorological products
+    j = 0           ! search at beginning of file.
+    jpdt    = -9999  ! array of values in product definition template, set towildcard
+    jids    = -9999  ! array of values in identification section, set towildcard
+    jgdt    = -9999  ! array of values in grid definition template, set towildcard
+    jgdtn   = -1     ! search for any grid definition number.
+    jpdtn   =  pdt_num ! Search for the product definition template number.
+    jpdt(1) = 3      ! Sect4/oct 10 - parameter category - mass
+    jpdt(2) = 0      ! Sect4/oct 11 - parameter number - pressure
+    jpdt(10) = octet_23 ! Sect4/oct 23 - type of level.
+    unpack=.true.
+
+    do vlev = 1, lev_input
+
+      jpdt(12) = nint(rlevs(vlev))
+      call getgb2(lugb, lugi, j, jdisc, jids, jpdtn, jpdt, jgdtn, jgdt, &
+             unpack, k, gfld, iret)
+      if (iret /= 0) then
+        call error_handler("READING IN PRESSURE AT LEVEL"//trim(slevs(vlev)),iret)
+      endif
+
+      dum2d_1 = reshape(gfld%fld, (/i_input,j_input/) )
+
+      dummy3d_pres(:,:,vlev) = dum2d_1
+
+    enddo
+
+    endif  ! localpet == 0
+
+   endif   ! read pressure for smoke conversion
+
+   if (tracers_input_vmap(n) == trac_names_vmap(15) .and. &
+       (trim(external_model) .ne. 'RAP' .and. &  ! for smoke conversion
+       trim(external_model) .ne. 'HRRR' ) ) then
+       cycle ! Do not process smoke for non RAP/HRRR
+   endif
+
    
    if (localpet == 0) then
 
@@ -2556,6 +2627,16 @@ implicit none
           print *,'- CALL CALRH non-GFS'
           call rh2spfh(dummy2d,rlevs(vlev),dummy3d(:,:,vlev))
         end if
+      endif
+
+      ! Convert smoke from mass density (RAP/HRRR = kg/m^3) to mixing ratio (ug/kg)
+      if ( tracers_input_vmap(n) == trac_names_vmap(15) ) then
+         do i = 1, i_input
+            do j = 1, j_input
+               dummy2d(i,j) = dummy2d(i,j) * 1.0d9 * &
+                              (287.05 * dummy3d(i,j,vlev) / dummy3d_pres(i,j,vlev))
+            enddo
+         enddo
       endif
 
        dummy3d(:,:,vlev) = real(dummy2d,esmf_kind_r8)
@@ -2820,7 +2901,7 @@ if (.not. isnative) then
      allocate(tmp1d(clb(3):cub(3)))
      tmp1d = presptr(cub(1),cub(2),:)
      print*,'pres is ',cub(1),cub(2),tmp1d
-     deallocate(tmp1d) 
+     deallocate(tmp1d)
    
      print*,'pres check 1',localpet,maxval(presptr(clb(1):cub(1),clb(2):cub(2),1)), &
           minval(presptr(clb(1):cub(1),clb(2):cub(2),1))
@@ -2873,6 +2954,7 @@ else ! is native coordinate (hybrid).
  endif
 
  deallocate(dummy3d, dum2d_1) 
+ if (allocated(dummy3d_pres)) deallocate(dummy3d_pres)
  
 !---------------------------------------------------------------------------
 ! Convert from 2-d to 3-d component winds.
@@ -3022,6 +3104,14 @@ else ! is native coordinate (hybrid).
      print*, "- CALL CALCALPHA_ROTLATLON with center lat,lon = ",latin1,lov
      call calcalpha_rotlatlon(lat,lon,latin1,lov,alpha)
 
+   elseif (gfld%igdtnum == 1) then ! grid definition template number - non-E stagger rotated lat/lon grid
+
+     latin1 = real(float(gfld%igdtmpl(20))/1.0E6, kind=esmf_kind_r4) + 90.0_esmf_kind_r4
+     lov = real(float(gfld%igdtmpl(21))/1.0E6, kind=esmf_kind_r4)
+
+     print*, "- CALL CALCALPHA_ROTLATLON with center lat,lon = ",latin1,lov
+     call calcalpha_rotlatlon(lat,lon,latin1,lov,alpha) 
+
    elseif (gfld%igdtnum == 30) then ! grid definition template number - lambert conformal grid.
 
      lov = real(float(gfld%igdtmpl(14))/1.0E6, kind=esmf_kind_r4)
@@ -3091,7 +3181,7 @@ else ! is native coordinate (hybrid).
           u(:,:,vlev) = u_tmp
           v(:,:,vlev) = v_tmp
         endif
-      else if (gfld%igdtnum == 32769) then ! grid definition template number - rotated lat/lon grid
+      else if (gfld%igdtnum == 32769 .or. gfld%igdtnum == 1) then ! grid definition template number - rotated lat/lon grid
         ws = sqrt(u_tmp**2 + v_tmp**2)
         wd = real((atan2(-u_tmp,-v_tmp) / d2r), kind=esmf_kind_r4) ! calculate grid-relative wind direction
         wd = real((wd + alpha + 180.0), kind=esmf_kind_r4) ! Rotate from grid- to earth-relative direction

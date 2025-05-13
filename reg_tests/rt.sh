@@ -1,5 +1,18 @@
 #!/bin/bash
 
+wait_for_fin() {
+  set -xu
+  sleep_time=0
+  while [ ! -f "summary.log" ]; do
+    sleep 10
+    sleep_time=$((sleep_time+10))
+    if (( sleep_time > TIMEOUT_LIMIT )); then
+       mail -s "UFS_UTILS Consistency Tests timed out on ${target}" ${MAILTO} < ${WORK_DIR}/reg_test_results.txt
+       exit 1
+    fi
+  done
+}
+
 ulimit -s unlimited
 
 export MAILTO=
@@ -73,44 +86,42 @@ cd fix
 
 cd ../reg_tests
 
-#if [[ $target == "orion" ]] || [[ $target == "jet" ]] || [[ $target == "hera" ]] || [[ $target == "hercules" ]] || [[ $target == "wcoss2" ]] ; then
-if [[ $target == "orion" ]] || [[ $target == "jet" ]] || [[ $target == "hera" ]] || [[ $target == "hercules" ]] ; then
+set -x
 
-  cd cpld_gridgen
+#if [[ $target == "orion" ]] || [[ $target == "jet" ]] || [[ $target == "hera" ]] || [[ $target == "hercules" ]] || [[ $target == "wcoss2" ]] ; then
+#if [[ $target == "orion" ]] || [[ $target == "jet" ]] || [[ $target == "hera" ]] || [[ $target == "hercules" ]] ; then
+
+  cd regrid_sfc
+  ./driver.sh
+
+  wait_for_fin
+
+  cd ..
+
   export ACCOUNT=$PROJECT_CODE
   export STMP=$WORK_DIR/reg-tests
 
-  ./rt.sh 2>/dev/null &
+  cd ocnice_prep
+  ./rt.sh
 
-  set -x
+  wait_for_fin
 
-  sleep_time=0
-  while [ ! -f "summary.log" ]; do
-    sleep 10
-    sleep_time=$((sleep_time+10))
-    if (( sleep_time > TIMEOUT_LIMIT )); then
-       kill -9 %1
-       mail -s "UFS_UTILS Consistency Tests timed out on ${target}" ${MAILTO} < ${WORK_DIR}/reg_test_results.txt
-       exit 1
-    fi
-  done
   cd ..
 
-fi
+  cd cpld_gridgen
+  ./rt.sh
 
-sleep_time=0
+  wait_for_fin
+
+  cd ..
+
+#fi
+
 for dir in snow2mdl global_cycle chgres_cube grid_gen; do
     cd $dir
     ./driver.$target.sh
     # Wait for job to complete
-    while [ ! -f "summary.log" ]; do
-        sleep 10
-        sleep_time=$((sleep_time+10))
-        if (( sleep_time > TIMEOUT_LIMIT )); then
-             mail -s "UFS_UTILS Consistency Tests timed out on ${target}" ${MAILTO} < ${WORK_DIR}/reg_test_results.txt
-            exit 1
-        fi
-    done
+    wait_for_fin
     cd ..
 done
 
@@ -123,15 +134,7 @@ for dir in weight_gen ice_blend; do
     fi
     
     # Wait for job to complete
-    sleep_time=0
-    while [ ! -f "summary.log" ]; do
-        sleep 10
-        sleep_time=$((sleep_time+10))
-        if (( sleep_time > TIMEOUT_LIMIT )); then
-            mail -s "UFS_UTILS Consistency Tests timed out on ${target}" ${MAILTO} < ${WORK_DIR}/reg_test_results.txt
-            exit 1
-        fi
-    done
+    wait_for_fin
     cd ..
 done
 
@@ -140,7 +143,7 @@ echo "Commit hash: ${current_hash}" >> ${WORK_DIR}/reg_test_results.txt
 echo "" >> ${WORK_DIR}/reg_test_results.txt
 
 success=true
-for dir in weight_gen cpld_gridgen chgres_cube grid_gen global_cycle ice_blend snow2mdl; do
+for dir in regrid_sfc weight_gen ocnice_prep cpld_gridgen chgres_cube grid_gen global_cycle ice_blend snow2mdl; do
     if grep -qi "FAILED" ${dir}/summary.log; then
         success=false
         echo "${dir} consistency tests FAILED" >> ${WORK_DIR}/reg_test_results.txt

@@ -23,14 +23,14 @@
 
 source ../../sorc/machine-setup.sh > /dev/null 2>&1
 module use ../../modulefiles
-module load build.$target.intel
+module load build.$target.intelllvm
 module list
 
 set -x
 
 QUEUE="${QUEUE:-batch}"
 PROJECT_CODE="${PROJECT_CODE:-hfv3gfs}"
-export WORK_DIR="${WORK_DIR:-/lfs4/HFIP/emcda/$LOGNAME/stmp}"
+export WORK_DIR="${WORK_DIR:-/lfs5/HFIP/emcda/$LOGNAME/stmp}"
 export WORK_DIR="${WORK_DIR}/reg-tests/grid-gen"
 
 #-----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ export home_dir=$PWD/../..
 export APRUN=time
 export APRUN_SFC=srun
 export OMP_STACKSIZE=2048m
-export HOMEreg=/lfs4/HFIP/hfv3gfs/emc.nemspara/role.ufsutils/ufs_utils/reg_tests/grid_gen/baseline_data
+export HOMEreg=/lfs5/HFIP/hfv3gfs/emc.nemspara/role.ufsutils/ufs_utils/reg_tests/grid_gen/baseline_data
 
 ulimit -a
 ulimit -s unlimited
@@ -72,7 +72,7 @@ TEST1=$(sbatch --parsable --ntasks-per-node=24 --nodes=1 -t 0:20:00 -A $PROJECT_
 #-----------------------------------------------------------------------------
 
 LOG_FILE2=${LOG_FILE}02
-TEST2=$(sbatch --parsable --ntasks-per-node=10 --nodes=3 -t 0:15:00 -A $PROJECT_CODE -q $QUEUE -J c96.viirs.bnu \
+TEST2=$(sbatch --parsable --ntasks-per-node=12 --nodes=4 -t 0:15:00 -A $PROJECT_CODE -q $QUEUE -J c96.viirs.bnu \
       --partition=xjet -o $LOG_FILE2 -e $LOG_FILE2 ./c96.viirs.bnu.sh)
 
 #-----------------------------------------------------------------------------
