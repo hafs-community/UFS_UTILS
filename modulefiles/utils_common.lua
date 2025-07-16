@@ -1,6 +1,6 @@
 whatis("Description: UFS_UTILS build environment common libraries")
 
-help([[Load UFS Model common libraries]])
+help([[Load UFS_UTILS common libraries]])
 
 local ufs_modules = {
   {["bacio"]           = "2.4.1"},
