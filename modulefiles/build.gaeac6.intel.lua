@@ -19,12 +19,11 @@ load("utils_common")
 nccmp_ver=os.getenv("nccmp_ver") or "1.9.1.0"
 load(pathJoin("nccmp", nccmp_ver))
 
-setenv("CC", "mpiicx")
-setenv("CXX", "mpiicpx")
-setenv("FC", "mpiifort")
-setenv("I_MPI_CC", "icx")
-setenv("I_MPI_CXX", "icpx")
-setenv("I_MPI_F90", "ifort")
+unload("cray-libsci")
+
+setenv("CC", "cc")
+setenv("CXX", "CC")
+setenv("FC", "ftn")
 
 setenv("CMAKE_Platform", "gaeac6.intel")
 
