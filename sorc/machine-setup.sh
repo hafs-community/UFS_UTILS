@@ -30,22 +30,24 @@ if [[ -d /lfs5 ]] ; then
 elif [[ -d /lfs/h1 ]] ; then
     target=wcoss2
     module reset
-elif [[ -d /scratch1 ]] ; then
-    # We are on NOAA Hera
-    if ( ! eval module help > /dev/null 2>&1 ) ; then
-        echo load the module command 1>&2
-        source /apps/lmod/lmod/init/$__ms_shell
-    fi
-    target=hera
-    module purge
 elif [[ -d /scratch3 && -d /scratch4 ]]; then
-    # We are on NOAA Ursa
-    if ( ! eval module help > /dev/null 2>&1 ) ; then
-        echo load the module command 1>&2
-        source $MODULESHOME/init/$__ms_shell
-    fi
-    target=ursa
-    module purge
+    if [[ "$(hostname)" =~ "ufe" ]] ; then
+       # We are on NOAA Ursa
+       if ( ! eval module help > /dev/null 2>&1 ) ; then
+          echo load the module command 1>&2
+          source $MODULESHOME/init/$__ms_shell
+       fi
+       target=ursa
+       module purge
+     elif [[ "$(hostname)" =~ "hfe" ]] ; then
+       # We are on NOAA Hera
+       if ( ! eval module help > /dev/null 2>&1 ) ; then
+          echo load the module command 1>&2
+          source /apps/lmod/lmod/init/$__ms_shell
+       fi
+       target=hera
+       module purge
+     fi
 elif [[ -d /lustre && -d /ncrc ]] ; then
     # We are on GAEA.
     if ( ! eval module help > /dev/null 2>&1 ) ; then
