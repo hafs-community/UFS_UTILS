@@ -27,10 +27,10 @@ libpng_ver=os.getenv("libpng_ver") or "1.6.37"
 load(pathJoin("libpng", libpng_ver))
 
 hdf5_ver=os.getenv("hdf5_ver") or "1.14.0"
-load(pathJoin("hdf5-C", hdf5_ver))
+load(pathJoin("hdf5-D", hdf5_ver))
 
 netcdf_ver=os.getenv("netcdf_ver") or "4.9.2"
-load(pathJoin("netcdf-C", netcdf_ver))
+load(pathJoin("netcdf-D", netcdf_ver))
 
 bacio_ver=os.getenv("bacio_ver") or "2.4.1"
 load(pathJoin("bacio", bacio_ver))
@@ -70,6 +70,17 @@ nco_ver=os.getenv("nco_ver") or "4.7.9"
 load(pathJoin("nco", nco_ver))
 
 esmf_ver=os.getenv("esmf_ver") or "8.6.0"
-load(pathJoin("esmf-C", esmf_ver))
+load(pathJoin("esmf-D", esmf_ver))
+
+local ofi_path = "/opt/cray/pe/mpich/8.1.19/ofi/intel/19.0/lib"
+local gtl_path = "/opt/cray/pe/mpich/8.1.19/gtl/lib"
+
+if isDir(ofi_path) then
+    prepend_path("LD_LIBRARY_PATH", ofi_path)
+end
+
+if isDir(gtl_path) then
+    prepend_path("LD_LIBRARY_PATH", gtl_path)
+end
 
 whatis("Description: UFS_UTILS build environment")
