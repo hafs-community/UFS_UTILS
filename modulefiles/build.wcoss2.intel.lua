@@ -72,6 +72,9 @@ load(pathJoin("nco", nco_ver))
 esmf_ver=os.getenv("esmf_ver") or "8.6.0"
 load(pathJoin("esmf-D", esmf_ver))
 
+pnetcdf_ver=os.getenv("pnetcdf_ver") or "1.12.2"
+load(pathJoin("pnetcdf-D", pnetcdf_ver))
+
 local ofi_path = "/opt/cray/pe/mpich/8.1.19/ofi/intel/19.0/lib"
 local gtl_path = "/opt/cray/pe/mpich/8.1.19/gtl/lib"
 
