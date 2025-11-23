@@ -82,7 +82,7 @@ program filter_topo
   !--- write out the data
   allocate(tmp_oro(is:ie,js:je,ntiles))
   tmp_oro=oro(is:ie,js:je,:)
-  call write_topo_file(is,ie,js,je,ntiles,tmp_oro,regional )
+  call write_topo_file(is,ie,js,je,ntiles,tmp_oro,regional)
   deallocate(tmp_oro)
 
   print*
@@ -1070,7 +1070,7 @@ contains
        status = nf_get_var_double(ncid, id_var, tmp)
        call handle_err(status, 'get the value of '//trim(topo_field)//' from file '//trim(tile_file) )
 
-       oro(is:ie,js:je,nt) =tmp
+       oro(is:ie,js:je,nt) = tmp
 
        status=nf_inq_varid(ncid, mask_field, id_var)
        call handle_err(status, 'inquire varid of '//trim(mask_field)//' from file '//trim(tile_file) )

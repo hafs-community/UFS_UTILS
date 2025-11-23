@@ -24,13 +24,13 @@
 
 source ../../sorc/machine-setup.sh > /dev/null 2>&1
 module use ../../modulefiles
-module load build.$target.intel
+module load build.$target.intelllvm
 module list
 
 set -x
 ulimit -s unlimited
 
-export WORK_DIR="${WORK_DIR:-/work/noaa/stmp/$LOGNAME}"
+WORK_DIR="${WORK_DIR:-/work2/noaa/stmp/$LOGNAME}"
 export WORK_DIR="${WORK_DIR}/reg-tests/grid-gen"
 QUEUE="${QUEUE:-batch}"
 PROJECT_CODE=${PROJECT_CODE:-fv3-cpu}

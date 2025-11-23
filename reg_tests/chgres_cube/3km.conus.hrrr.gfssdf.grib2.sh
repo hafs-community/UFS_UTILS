@@ -15,7 +15,7 @@ rm -fr $DATA
 export CRES=3357
 export KMRES=3km
 export FIXfv3=${HOMEreg}/fix/RRFS_CONUS_${KMRES}
-export FIXsfc=${FIXfv3}/fix_sfc
+
 export COMIN=${HOMEreg}/input_data/hrrr.grib2
 
 export GRIB2_FILE_INPUT=1918200000000
@@ -35,6 +35,8 @@ export TRACERS_INPUT='"NULL"'
 export GEOGRID_FILE_INPUT=${HOMEufs}/fix/am/geo_em.d01.nc_HRRRX
 
 export OMP_NUM_THREADS_CH=${OMP_NUM_THREADS:-1}
+
+NCCMP=${NCCMP:-$(which nccmp)}
 
 #-----------------------------------------------------------------------------
 # Invoke chgres program.

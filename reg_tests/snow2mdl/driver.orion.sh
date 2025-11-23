@@ -22,7 +22,10 @@ set -x
 
 source ../../sorc/machine-setup.sh > /dev/null 2>&1
 module use ../../modulefiles
-module load build.$target.intel
+module load build.$target.intelllvm
+module load grib-util/1.3.0
+module load wgrib2/2.0.8
+module load prod_util/2.1.1
 module list
 
 ulimit -s unlimited
@@ -44,20 +47,20 @@ if [ "$UPDATE_BASELINE" = "TRUE" ]; then
   source ../get_hash.sh
 fi
 
+export OMP_NUM_THREADS=1
+
 rm -fr $DATA_ROOT
 
 export HOMEreg=/work/noaa/nems/role-nems/ufs_utils/reg_tests/snow2mdl
 export HOMEgfs=$PWD/../..
-export WGRIB=/apps/contrib/NCEPLIBS/orion/utils/grib_util.v1.2.0/exec/wgrib
-export WGRIB2=/apps/contrib/NCEPLIBS/orion/utils/grib_util.v1.2.0/exec/wgrib2
 
-# The first test mimics GFS OPS.
+# The first test uses the hemispheric afwa/air force data, which was used in OPS.
 
-export DATA="${DATA_ROOT}/test.ops"
-TEST1=$(sbatch --parsable -J snow.ops -A $PROJECT_CODE -o consistency.log \
-        -e consistency.log --ntasks=1 -q $QUEUE -t 00:03:00 ./snow2mdl.ops.sh)
+export DATA="${DATA_ROOT}/test.hemi"
+TEST1=$(sbatch --parsable -J snow.hemi -A $PROJECT_CODE -o consistency.log \
+        -e consistency.log --ntasks=1 -q $QUEUE -t 00:03:00 ./snow2mdl.hemi.sh)
 
-# This tests the afwa global grib2 data. 
+# This tests the afwa global grib2 data, which is used in OPS.
 
 export DATA="${DATA_ROOT}/test.global"
 TEST2=$(sbatch --parsable -J snow.global -A $PROJECT_CODE -o consistency.log \

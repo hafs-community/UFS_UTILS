@@ -111,7 +111,7 @@ export out_dir=${out_dir:?}
 export home_dir=${home_dir:-"$PWD/../"}
 export script_dir=$home_dir/ush
 export exec_dir=${exec_dir:-"$home_dir/exec"}
-export topo=$home_dir/fix/orog_raw
+export topo=$home_dir/fix/orog
 export NCDUMP=${NCDUMP:-ncdump}
 
 
@@ -636,7 +636,7 @@ The following parameters were used
         soil_type=$soil_type_src
 	lake_data_srce=$lake_data_srce
         target_lon=$target_lon          # Center longitude of grid
-        target_lat=target_lat           # Center latitude of grid
+        target_lat=$target_lat          # Center latitude of grid
         idim=$idim                      # Dimension of grid in 'i' direction
         jdim=$jdim                      # Dimension of grid in 'j' direction
         delx=$delx                      # Grid spacing (in degrees) in the 'i' direction

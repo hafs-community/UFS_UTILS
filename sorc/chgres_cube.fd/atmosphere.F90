@@ -1037,7 +1037,7 @@
 
  deallocate(pi)
 
- if (localpet == 0) then 
+ if (localpet == 0) then
     allocate(tmp1d(clb(3):cub(3)))
     tmp1d = pptr(clb(1),clb(2),:)
 !    print*,'new pres ',pptr(clb(1),clb(2),:)
