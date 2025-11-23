@@ -9,8 +9,10 @@
 !! 
 !! @param[in] unt          file unit
 !! @param[in] namel        options: input or output
+!! @param[in] nmem_ens     number of ensemble members
+!! @param[in] imem_ens     ensemble member index
 !! @param[out] grid_setup  data structure with grid details
- subroutine readin_setup(unt,namel,grid_setup)
+ subroutine readin_setup(unt,namel,nmem_ens,imem_ens,grid_setup)
 
  use grids_IO, only     : grid_setup_type
  use utilities, only    : error_handler
@@ -18,29 +20,33 @@
  implicit none
 
  ! INPUTS
- integer, intent(in) :: unt
+ integer, intent(in) :: unt, nmem_ens, imem_ens
  character(*), intent(in) :: namel
  ! OUTPUTS
  type(grid_setup_type), intent(out) :: grid_setup
 
  character(len=7)   :: gridtype
  character(len=100) :: fname, fname_mask, fname_coord
- character(len=100) :: dir, dir_mask, dir_coord
+ character(len=100) :: dir(nmem_ens), dir_mask, dir_coord
  character(len=4)   :: default_str="NULL"
  integer            :: ires, jres
  integer            :: ierr
+ logical            :: add_time_dim
+ integer            :: fhrs(10) ! forecast hours of increment files
 
  namelist /input/  fname, dir, &
                    gridtype, &
                    fname_mask, dir_mask, &
                    fname_coord, dir_coord, &
-                   ires, jres
+                   ires, jres, &
+                   fhrs         
 
  namelist /output/  fname, dir, &
                     gridtype, &
                     fname_mask, dir_mask, &
                     fname_coord, dir_coord,&
-                    ires, jres
+                    ires, jres, &
+                    add_time_dim
 
  ! set defaults
  fname = default_str
@@ -51,6 +57,8 @@
  dir_coord = default_str
  ires = 0
  jres = 0
+ add_time_dim = .false.
+ fhrs = -1
 
  select case (namel)
  case ("input")
@@ -65,8 +73,9 @@
 
  grid_setup%descriptor = gridtype
 
- grid_setup%dir = dir
+ grid_setup%dir = dir(imem_ens)
  grid_setup%fname = fname
+ grid_setup%mask_from_input = .false.
 
  ! set-up mask details, based on file type
  select case (gridtype)
@@ -76,8 +85,9 @@
      grid_setup%mask_variable(1) =  "vegetation_type" ! if getting from fix file
  case ("gau_inc") ! gsi-output incr files only, use calculated mask
      if (trim(fname_mask) == default_str) then ! if not specified, use input file
-         grid_setup%dir_mask = dir
+         grid_setup%dir_mask = dir(imem_ens)
          grid_setup%fname_mask = fname
+         grid_setup%mask_from_input = .true.
      else
          grid_setup%dir_mask = dir_mask
          grid_setup%fname_mask = fname_mask
