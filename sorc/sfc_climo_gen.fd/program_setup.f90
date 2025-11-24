@@ -36,16 +36,14 @@
  character(len=500), public   :: orog_dir_mdl = "NULL" !< Directory containing the model grid orography files.
  character(len=500), public   :: orog_files_mdl(6) = "NULL" !< Model grid orography filenames.
 
- character(len=50), public    :: substrate_temperature_method='bilinear' !< Interpolation method for substrate temperature.
-                                                                         !! nearest_stod, conservative or bilinear (default).
  character(len=50), public    :: leaf_area_index_method='bilinear' !< Interpolation method for leaf area index.
-                                                                   !! nearest_stod, conservative or bilinear (default).
+                                                                   !! Conservative or bilinear (default).
  character(len=50), public    :: maximum_snow_albedo_method='bilinear' !< Interpolation method for max snow albedo.
-                                                                       !! nearest_stod, conservative or bilinear (default).
+                                                                       !! Conservative or bilinear (default).
  character(len=50), public    :: snowfree_albedo_method='bilinear' !< Interpolation method for snowfree albedo.
-                                                                   !! nearest_stod, conservative or bilinear (default).
+                                                                   !! Conservative or bilinear (default).
  character(len=50), public    :: vegetation_greenness_method='bilinear' !< Interpolation method for vegetation greenness.
-                                                                        !! nearest_stod, conservative or bilinear (default).
+                                                                        !! Conservative or bilinear (default).
 
  integer, public              :: halo = 0 !< Number of row/cols defining the lateral
                                           !! boundary halo. Used for regional nests.
@@ -78,7 +76,6 @@
                    input_leaf_area_index_file, input_vegetation_type_file, &
                    input_vegetation_greenness_file, mosaic_file_mdl, &
                    orog_dir_mdl, orog_files_mdl, halo, &
-                   substrate_temperature_method, &
                    vegetation_greenness_method, leaf_area_index_method, &
                    maximum_snow_albedo_method, snowfree_albedo_method, &
                    fract_vegsoil_type

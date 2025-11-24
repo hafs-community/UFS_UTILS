@@ -96,7 +96,6 @@
    call define_source_grid(localpet, npets, input_snowfree_albedo_file)
    method=ESMF_REGRIDMETHOD_BILINEAR
    if (trim(snowfree_albedo_method)=="conserve") method=ESMF_REGRIDMETHOD_CONSERVE
-   if (trim(snowfree_albedo_method)=="nearest_stod") method=ESMF_REGRIDMETHOD_CONSERVE
    call interp(localpet, method, input_snowfree_albedo_file)
    call source_grid_cleanup
  endif
@@ -107,7 +106,6 @@
    call define_source_grid(localpet, npets, input_maximum_snow_albedo_file)
    method=ESMF_REGRIDMETHOD_BILINEAR
    if (trim(maximum_snow_albedo_method)=="conserve") method=ESMF_REGRIDMETHOD_CONSERVE
-   if (trim(maximum_snow_albedo_method)=="nearest_stod") method=ESMF_REGRIDMETHOD_NEAREST_STOD
    call interp(localpet, method, input_maximum_snow_albedo_file)
    call source_grid_cleanup
  endif
@@ -127,8 +125,6 @@
  if (trim(input_substrate_temperature_file) /= "NULL") then
    call define_source_grid(localpet, npets, input_substrate_temperature_file)
    method=ESMF_REGRIDMETHOD_BILINEAR
-   if (trim(substrate_temperature_method)=="conserve") method=ESMF_REGRIDMETHOD_CONSERVE
-   if (trim(substrate_temperature_method)=="nearest_stod") method=ESMF_REGRIDMETHOD_NEAREST_STOD
    call interp(localpet, method, input_substrate_temperature_file)
    call source_grid_cleanup
  endif
@@ -173,7 +169,6 @@
    call define_source_grid(localpet, npets, input_vegetation_greenness_file)
    method=ESMF_REGRIDMETHOD_BILINEAR
    if (trim(vegetation_greenness_method)=="conserve") method=ESMF_REGRIDMETHOD_CONSERVE
-   if (trim(vegetation_greenness_method)=="nearest_stod") method=ESMF_REGRIDMETHOD_NEAREST_STOD
    call interp(localpet, method, input_vegetation_greenness_file)
    call source_grid_cleanup
  endif
@@ -184,7 +179,6 @@
    call define_source_grid(localpet, npets, input_leaf_area_index_file)
    method=ESMF_REGRIDMETHOD_BILINEAR
    if (trim(leaf_area_index_method)=="conserve") method=ESMF_REGRIDMETHOD_CONSERVE
-   if (trim(leaf_area_index_method)=="nearest_stod") method=ESMF_REGRIDMETHOD_NEAREST_STOD
    call interp(localpet, method, input_leaf_area_index_file)
    call source_grid_cleanup
  endif
