@@ -1,9 +1,9 @@
 help([[
-Load environment to compile UFS_UTILS on Hera using Intel
+Load environment to compile UFS_UTILS on Ursa using Intel
 ]])
 
-prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.9.2/envs/wgrib2-oneapi-2024.2.1/install/modulefiles/Core")
-prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.9.2/envs/wgrib2-oneapi-2024.2.1/install/modulefiles/intel-oneapi-mpi/2021.13-sbi3u54/gcc/13.3.0")
+prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.9.2/envs/ue-oneapi-2024.2.1/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/contrib/spack-stack/spack-stack-1.9.2/envs/ue-oneapi-2024.2.1/install/modulefiles/intel-oneapi-mpi/2021.13-haww6b3/gcc/12.4.0")
 
 stack_oneapi_ver=os.getenv("stack_oneapi_ver") or "2024.2.1"
 load(pathJoin("stack-oneapi", stack_oneapi_ver))
@@ -26,6 +26,6 @@ setenv("I_MPI_CC", "icx")
 setenv("I_MPI_CXX", "icpx")
 setenv("I_MPI_F90", "ifort")
 
-setenv("CMAKE_Platform", "hera.intel")
+setenv("CMAKE_Platform", "ursa.intel")
 
 whatis("Description: UFS_UTILS build environment")
